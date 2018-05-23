@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Run script') {
             steps {
-              sh './OracleHTTPServer/dockerfiles/buildDockerImage.sh -v 12.2.1.2.0'
+              sh 'cd ./OracleHTTPServer/dockerfiles/ && ./buildDockerImage.sh -v 12.2.1.2.0'
             }
         }
         stage('retag image and push') {
