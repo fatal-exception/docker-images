@@ -13,14 +13,15 @@ pipeline {
         }
         stage('Run script') {
             steps {
+              sh '$(aws ecr get-login --no-include-email --region eu-west-1)'
               sh 'cd ./OracleHTTPServer/dockerfiles/ && ./buildDockerImage.sh -v 12.2.1.2.0'
             }
         }
         stage('retag image and push') {
-          steps {
-            sh 'docker tag oracle/ohs:12.2.1.2.0-sa 068764521548.dkr.ecr.eu-west-1.amazonaws.com/oracle-http-server:12.2.1.2.0-sa'
-            sh 'docker push 068764521548.dkr.ecr.eu-west-1.amazonaws.com/oracle-http-server:12.2.1.2.0-sa'
-          }
+            steps {
+              sh 'docker tag oracle/ohs:12.2.1.2.0-sa 068764521548.dkr.ecr.eu-west-1.amazonaws.com/oracle-http-server:12.2.1.2.0-sa'
+              sh 'docker push 068764521548.dkr.ecr.eu-west-1.amazonaws.com/oracle-http-server:12.2.1.2.0-sa'
+            }
         }
     }
 }
