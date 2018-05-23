@@ -25,16 +25,16 @@
 #     $ sh buildDockerImage.sh -v 12.2.1.2.0
 #
 # Alternatively you can also run
-# 
+#
 #     $ docker build --force-rm=true --no-cache=true --rm=true -t oracle/$IMAGE_NAME:$VERSION-$INSTALL_TYPE .
 #
 # For example
-# 
+#
 #     $ docker build --force-rm=true --no-cache=true --rm=true -t oracle/ohs:12.2.1.2.0-sa .
 #
 # Pull serverjre:8 base image
 # -----------------------------------
-FROM oracle/serverjre:8
+FROM 068764521548.dkr.ecr.eu-west-1.amazonaws.com/oracle-serverjre-8:latest
 
 # Maintainer
 # ------------------------------------
@@ -45,7 +45,7 @@ MAINTAINER Prabhat Kishore <prabhat.kishore@oracle.com>
 ENV OHS_PKG=fmw_12.2.1.2.0_ohs_linux64_Disk1_1of1.zip \
     OHS_BIN=fmw_12.2.1.2.0_ohs_linux64.bin \
     ORACLE_HOME=/u01/oracle/ohssa \
-    USER_MEM_ARGS="-Djava.security.egd=file:/dev/./urandom" \ 
+    USER_MEM_ARGS="-Djava.security.egd=file:/dev/./urandom" \
     PATH=$PATH:/usr/java/default/bin:/u01/oracle/ohssa/oracle_common/common/bin \
     NM_PORT=5556 \
     OHS_LISTEN_PORT=7777 \
@@ -56,7 +56,6 @@ ENV OHS_PKG=fmw_12.2.1.2.0_ohs_linux64_Disk1_1of1.zip \
     OHS_COMPONENT_NAME=ohs_sa1 \
     PATH=$PATH:$ORACLE_HOME/oracle_common/common/bin:$ORACLE_HOME/user_projects/domains/ohsDomain/bin:/u01/oracle/container-scripts \
     WLST_HOME=/u01/oracle/ohssa/oracle_common/common/bin
-
 
 # Copy packages to the new drive
 # -------------------------------------------------------
@@ -72,15 +71,15 @@ RUN yum install -y unzip libaio sysstat && \
     chmod a+xr /u01 && \
     useradd -b /u01 -m -s /bin/bash oracle && \
     mkdir /u01/oracle/.inventory && \
-    chown oracle:oracle -R /u01 
+    chown oracle:oracle -R /u01
 
 # Go to /u01 as user 'oracle' to proceed with OHS installation
 #--------------------------------------------------------
 USER oracle
 RUN cd /u01 && unzip -q /u01/$OHS_PKG && cd - && \
-    /u01/$OHS_BIN -ignoreSysPrereqs -novalidation -silent -responseFile /u01/install.file -invPtrLoc /u01/oraInst.loc ORACLE_HOME=$ORACLE_HOME && \ 
+    /u01/$OHS_BIN -ignoreSysPrereqs -novalidation -silent -responseFile /u01/install.file -invPtrLoc /u01/oraInst.loc ORACLE_HOME=$ORACLE_HOME && \
     rm /u01/$OHS_BIN /u01/$OHS_PKG /u01/oraInst.loc /u01/install.file && \
-    mkdir /u01/oracle/container-scripts/ /u01/oracle/logs 
+    mkdir /u01/oracle/container-scripts/ /u01/oracle/logs
 
 # Copy required files to build this image
 # ------------------------------------------------------
@@ -94,4 +93,3 @@ WORKDIR /u01/oracle/container-scripts
 
 # Provision OHS instance
 CMD ["/u01/oracle/container-scripts/provisionOHS.sh"]
-
